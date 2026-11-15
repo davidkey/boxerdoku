@@ -25,9 +25,6 @@ document.getElementById('f').onload = async () => {
     ok(n === 7, 'daily board is 7x7 (got ' + n + ')');
     tap(0); ok(st(0) === '1', 'tap -> mark');
     tap(0); ok(st(0) === '2', 'tap -> boxer');
-    ok(D.querySelectorAll('.cell.auto').length > 0, 'auto-marks shown');
-    D.querySelector('#automark').click();
-    ok(D.querySelectorAll('.cell.auto').length === 0, 'auto-marks toggle off');
     tap(1); tap(1);
     ok(cells()[0].classList.contains('wrong') || cells()[1].classList.contains('wrong'), 'adjacent boxers: at least one flagged wrong');
     D.querySelector('#undo').click(); ok(st(1) === '1', 'undo');
@@ -36,12 +33,25 @@ document.getElementById('f').onload = async () => {
     D.querySelector('#hint').click();
     const good = cells().findIndex((c) => c.dataset.state === '2');
     ok(good >= 0 && !cells()[good].classList.contains('wrong'), 'correct boxer not flagged');
+    ok(D.querySelectorAll('.cell.auto').length > 0, 'auto-marks shown around correct boxer');
+    D.querySelector('#automark').click();
+    ok(D.querySelectorAll('.cell.auto').length === 0, 'auto-marks toggle off');
+    D.querySelector('#automark').click();
     const bad = Math.floor(good / n) * n + ((good % n) + 3) % n;
     tap(bad); tap(bad);
     ok(cells()[bad].classList.contains('wrong'), 'wrong boxer flagged');
     ok(cells()[bad].classList.contains('oops'), 'wrong boxer shakes');
     ok(D.querySelector('#toast').textContent === 'Not there!' && D.querySelector('#toast').classList.contains('show'), 'wrong boxer toast');
-    tap(bad); ok(!cells()[bad].classList.contains('wrong'), 'flag clears when removed');
+    await wait(900);
+    ok(st(bad) === '1' && !cells()[bad].classList.contains('wrong'), 'wrong boxer fades into a mark');
+    D.querySelector('#undo').click();
+    ok(st(bad) === '1', 'undo goes back to before the wrong tap (mark)');
+    D.querySelector('#undo').click();
+    ok(st(bad)[0] === '0', 'undo again -> empty');
+    // tapping the wrong boxer again mid-animation just settles it into a mark
+    tap(bad); tap(bad); tap(bad);
+    ok(st(bad) === '1', 'tap during animation settles to mark (no re-cycle)');
+    // switching away mid-animation doesn't leave a wrong boxer saved
     D.querySelector('#clear').click();
     // drag paint
     ptr('pointerdown', cells()[n]); ptr('pointermove', cells()[n + 1]); ptr('pointermove', cells()[n + 2]); ptr('pointerup', cells()[n + 2]);

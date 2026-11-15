@@ -59,6 +59,7 @@
   const timerEl = $('#timer');
 
   function startMode(mode, forceNew) {
+    if (game) settleWrong();
     store.mode = mode;
     const n = MODES[mode].n;
     let rec = store.games[mode];
@@ -75,6 +76,7 @@
 
     store.games[mode] = game = rec;
     puzzle = Gen.generate(n, rec.seed);
+    rec.cells.forEach((st, i) => { if (st === BOXER && !isAnswer(i)) rec.cells[i] = MARK; });
     history = [];
     save();
     renderTabs();
@@ -125,6 +127,7 @@
     const auto = new Set();
     if (!store.settings.autoMark) return auto;
     for (const b of boxers) {
+      if (!isAnswer(b)) continue;
       const rb = Math.floor(b / n), cb = b % n;
       for (let i = 0; i < n * n; i++) {
         if (i === b || game.cells[i] !== EMPTY) continue;
@@ -190,6 +193,7 @@
   }
 
   function cycle(i) {
+    settleWrong();
     pushHistory();
     const next = (game.cells[i] + 1) % 3;
     setCell(i, next);
@@ -206,6 +210,28 @@
     el.classList.add('oops');
     if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
     toast('Not there!');
+    pendingWrong = { i, timer: setTimeout(settleWrong, WRONG_MS) };
+  }
+
+  // After the shake, a wrong boxer fades into a paw mark: we know no boxer
+  // goes there. Called early (before any other input) so state stays sane.
+  const WRONG_MS = 750;
+  let pendingWrong = null;
+  function settleWrong() {
+    if (!pendingWrong) return;
+    const { i, timer } = pendingWrong;
+    pendingWrong = null;
+    clearTimeout(timer);
+    const el = cellEls[i];
+    if (el) el.classList.remove('oops');
+    if (game.cells[i] !== BOXER || isAnswer(i)) return;
+    game.cells[i] = MARK; // same undo step as the tap that placed it
+    commit();
+    if (el) {
+      el.classList.remove('fadein');
+      void el.offsetWidth;
+      el.classList.add('fadein');
+    }
   }
 
   function commit() {
@@ -231,10 +257,13 @@
   }
 
   board.addEventListener('pointerdown', (e) => {
-    if (game.done) return;
     const idx = cellFromPoint(e.clientX, e.clientY);
-    if (idx === null) return;
+    // Tapping a wrong boxer mid-animation just finishes turning it into a mark.
+    const tappedPending = pendingWrong && pendingWrong.i === idx;
+    settleWrong();
+    if (game.done || idx === null) return;
     e.preventDefault();
+    if (tappedPending) return;
     const s = game.cells[idx];
     drag = { start: idx, last: idx, moved: false, mode: s === EMPTY ? 'paint' : s === MARK ? 'erase' : null, id: e.pointerId };
     try { board.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
@@ -288,12 +317,14 @@
 
   // ---------------------------------------------------------------- controls
   $('#undo').addEventListener('click', () => {
+    settleWrong();
     if (!history.length || game.done) return;
     game.cells = history.pop();
     commit();
   });
 
   $('#clear').addEventListener('click', () => {
+    settleWrong();
     if (game.done || game.cells.every((s) => s === EMPTY)) return;
     pushHistory();
     game.cells.fill(EMPTY);
@@ -301,6 +332,7 @@
   });
 
   $('#hint').addEventListener('click', () => {
+    settleWrong();
     if (game.done) return;
     const { n, solution } = puzzle;
     let target = -1, msg = '';
