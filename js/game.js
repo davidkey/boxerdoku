@@ -114,22 +114,10 @@
     }
   }
 
-  function computeConflicts() {
-    const { n, regions } = puzzle;
+  function boxerCells() {
     const boxers = [];
     game.cells.forEach((s, i) => { if (s === BOXER) boxers.push(i); });
-    const bad = new Set();
-    for (let a = 0; a < boxers.length; a++) {
-      for (let b = a + 1; b < boxers.length; b++) {
-        const i = boxers[a], j = boxers[b];
-        const ri = Math.floor(i / n), ci = i % n, rj = Math.floor(j / n), cj = j % n;
-        if (ri === rj || ci === cj || regions[i] === regions[j] ||
-            (Math.abs(ri - rj) <= 1 && Math.abs(ci - cj) <= 1)) {
-          bad.add(i); bad.add(j);
-        }
-      }
-    }
-    return { boxers, bad };
+    return boxers;
   }
 
   function computeAutoMarks(boxers) {
@@ -149,7 +137,7 @@
   }
 
   function update() {
-    const { boxers, bad } = computeConflicts();
+    const boxers = boxerCells();
     const auto = computeAutoMarks(boxers);
     cellEls.forEach((el, i) => {
       const s = game.cells[i];
@@ -160,7 +148,7 @@
         if (s === BOXER) el.appendChild(R.node(R.pieceForRegion(THEME, puzzle.regions[i]), 'piece'));
         else if (s === MARK || auto.has(i)) el.appendChild(R.node(THEME.mark, 'mark'));
       }
-      el.classList.toggle('conflict', bad.has(i));
+      el.classList.toggle('wrong', s === BOXER && !isAnswer(i));
       el.classList.toggle('auto', auto.has(i));
       el.setAttribute('aria-label', cellLabel(i, s));
     });
@@ -174,6 +162,11 @@
     const n = puzzle.n;
     const pos = `Row ${Math.floor(i / n) + 1}, column ${(i % n) + 1}`;
     return pos + (s === BOXER ? ', boxer' : s === MARK ? ', marked' : ', empty');
+  }
+
+  // Puzzles have exactly one solution, so any boxer off it is a mistake.
+  function isAnswer(i) {
+    return puzzle.solution[Math.floor(i / puzzle.n)] === i % puzzle.n;
   }
 
   function isSolved() {
@@ -198,9 +191,21 @@
 
   function cycle(i) {
     pushHistory();
-    setCell(i, (game.cells[i] + 1) % 3);
+    const next = (game.cells[i] + 1) % 3;
+    setCell(i, next);
     commit();
-    pop(i);
+    if (next === BOXER && !isAnswer(i)) oops(i);
+    else pop(i);
+  }
+
+  // Immediate feedback for a boxer placed where it can't go.
+  function oops(i) {
+    const el = cellEls[i];
+    el.classList.remove('oops', 'pop');
+    void el.offsetWidth;
+    el.classList.add('oops');
+    if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
+    toast('Not there!');
   }
 
   function commit() {
@@ -298,7 +303,6 @@
   $('#hint').addEventListener('click', () => {
     if (game.done) return;
     const { n, solution } = puzzle;
-    const isAnswer = (i) => solution[Math.floor(i / n)] === i % n;
     let target = -1, msg = '';
     // 1. a boxer in the wrong spot
     target = game.cells.findIndex((s, i) => s === BOXER && !isAnswer(i));

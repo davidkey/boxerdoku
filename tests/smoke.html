@@ -1,6 +1,6 @@
 <!doctype html>
 <meta charset="utf-8">
-<title>Boxerdoku smoke test</title>
+<title>BubbasDoku smoke test</title>
 <iframe id="f" src="../index.html" style="width:390px;height:844px;border:0"></iframe>
 <p>Run in a fresh browser profile (first-visit state).</p>
 <pre id="out">running</pre>
@@ -29,9 +29,20 @@ document.getElementById('f').onload = async () => {
     D.querySelector('#automark').click();
     ok(D.querySelectorAll('.cell.auto').length === 0, 'auto-marks toggle off');
     tap(1); tap(1);
-    ok(cells()[0].classList.contains('conflict') && cells()[1].classList.contains('conflict'), 'adjacent boxers conflict');
+    ok(cells()[0].classList.contains('wrong') || cells()[1].classList.contains('wrong'), 'adjacent boxers: at least one flagged wrong');
     D.querySelector('#undo').click(); ok(st(1) === '1', 'undo');
     D.querySelector('#clear').click(); ok(cells().every((c) => c.dataset.state === '0'), 'clear');
+    // wrong placement feedback: hint places a correct boxer; another cell in its row must be wrong
+    D.querySelector('#hint').click();
+    const good = cells().findIndex((c) => c.dataset.state === '2');
+    ok(good >= 0 && !cells()[good].classList.contains('wrong'), 'correct boxer not flagged');
+    const bad = Math.floor(good / n) * n + ((good % n) + 3) % n;
+    tap(bad); tap(bad);
+    ok(cells()[bad].classList.contains('wrong'), 'wrong boxer flagged');
+    ok(cells()[bad].classList.contains('oops'), 'wrong boxer shakes');
+    ok(D.querySelector('#toast').textContent === 'Not there!' && D.querySelector('#toast').classList.contains('show'), 'wrong boxer toast');
+    tap(bad); ok(!cells()[bad].classList.contains('wrong'), 'flag clears when removed');
+    D.querySelector('#clear').click();
     // drag paint
     ptr('pointerdown', cells()[n]); ptr('pointermove', cells()[n + 1]); ptr('pointermove', cells()[n + 2]); ptr('pointerup', cells()[n + 2]);
     ok(st(n) === '1' && st(n + 1) === '1' && st(n + 2) === '1', 'drag paints marks');
