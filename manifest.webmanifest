@@ -1,6 +1,6 @@
 {
-  "name": "Boxerdoku",
-  "short_name": "Boxerdoku",
+  "name": "BubbasDoku",
+  "short_name": "BubbasDoku",
   "description": "A logic puzzle: place one boxer in every row, column and region.",
   "start_url": "./",
   "scope": "./",

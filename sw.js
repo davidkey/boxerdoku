@@ -1,5 +1,5 @@
 // Network-first service worker: always fresh when online, works offline.
-const CACHE = 'boxerdoku-v2';
+const CACHE = 'boxerdoku-v3';
 const SHELL = [
   './', 'index.html', 'css/styles.css',
   'js/theme.js', 'js/generator.js', 'js/game.js',

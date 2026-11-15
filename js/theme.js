@@ -16,7 +16,7 @@
  * boxer…). With a single entry, every boxer looks the same.
  */
 window.BOXER_THEME = {
-  appName: 'Boxerdoku',
+  appName: 'BubbasDoku',
 
   // The piece the player places on the board.
   pieces: [

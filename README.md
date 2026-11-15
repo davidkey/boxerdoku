@@ -1,4 +1,4 @@
-# Boxerdoku 🐶
+# BubbasDoku 🐶
 
 A mobile-first logic puzzle web app. Place **one boxer in every row, column and
 colored region**. Boxers can't touch each other, not even diagonally.
@@ -35,7 +35,7 @@ pieces: [
   { image: 'assets/boxers/white.png',   alt: 'White boxer' },
 ],
 mark: { image: 'assets/paw.svg', alt: '' },
-logo: { image: 'assets/boxers/fawn.png', alt: 'Boxerdoku' },
+logo: { image: 'assets/boxers/fawn.png', alt: 'BubbasDoku' },
 ```
 
 - Put the files in `assets/boxers/`. Square PNG, WebP or SVG with a transparent background works best.
