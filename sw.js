@@ -1,9 +1,9 @@
 // Network-first service worker: always fresh when online, works offline.
-const CACHE = 'boxerdoku-v1';
+const CACHE = 'boxerdoku-v2';
 const SHELL = [
   './', 'index.html', 'css/styles.css',
   'js/theme.js', 'js/generator.js', 'js/game.js',
-  'manifest.webmanifest', 'icons/icon.svg',
+  'manifest.webmanifest', 'icons/favicon-64.png', 'icons/icon-192.png', 'assets/boxers/boxer.png',
 ];
 
 self.addEventListener('install', (e) => {

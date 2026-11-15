@@ -20,8 +20,8 @@ window.BOXER_THEME = {
 
   // The piece the player places on the board.
   pieces: [
-    { emoji: '🐶' },
-    // Example of real pictures (drop files into assets/boxers/):
+    { image: 'assets/boxers/boxer.png', alt: 'Boxer' },
+    // More pictures (drop files into assets/boxers/) give each region its own boxer:
     // { image: 'assets/boxers/fawn.png',    alt: 'Fawn boxer' },
     // { image: 'assets/boxers/brindle.png', alt: 'Brindle boxer' },
     // { image: 'assets/boxers/white.png',   alt: 'White boxer' },
@@ -31,10 +31,10 @@ window.BOXER_THEME = {
   mark: { emoji: '🐾' },
 
   // Shown in the title bar and the win screen.
-  logo: { emoji: '🐶' },
+  logo: { image: 'assets/boxers/boxer.png', alt: '' },
 
   // Rains down when a puzzle is solved.
-  celebrate: [{ emoji: '🐶' }, { emoji: '🦴' }, { emoji: '🐾' }, { emoji: '🎾' }],
+  celebrate: [{ image: 'assets/boxers/boxer.png', alt: '' }, { emoji: '🦴' }, { emoji: '🐾' }, { emoji: '🎾' }],
 
   // Pastel region colors (cycled if the board has more regions than colors).
   regionColors: [
