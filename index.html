@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#7a4a2a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Boxerdoku">
+  <meta name="description" content="A daily logic puzzle: place one boxer in every row, column and region.">
+  <title>Boxerdoku</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">
+        <span id="logo" class="logo"></span>
+        <div>
+          <h1 id="app-name">Boxerdoku</h1>
+          <p id="subtitle" class="subtitle"></p>
+        </div>
+      </div>
+      <button id="help-btn" class="icon-btn" type="button" aria-label="How to play">?</button>
+    </header>
+
+    <nav id="tabs" class="tabs" aria-label="Puzzle mode"></nav>
+
+    <div class="status">
+      <span class="chip"><span aria-hidden="true">⏱</span> <span id="timer">0:00</span></span>
+      <span class="chip"><span data-piece="boxer"></span> <span id="count">0 / 0</span></span>
+    </div>
+
+    <main class="board-wrap">
+      <div id="board" class="board" role="grid"></div>
+    </main>
+
+    <div class="controls">
+      <button id="undo" class="btn" type="button"><span aria-hidden="true">↶</span> Undo</button>
+      <button id="hint" class="btn" type="button"><span aria-hidden="true">💡</span> Hint</button>
+      <button id="clear" class="btn" type="button"><span aria-hidden="true">⟲</span> Clear</button>
+    </div>
+
+    <div class="footer-row">
+      <label class="toggle">
+        <input id="automark" type="checkbox">
+        <span class="track"><span class="thumb"></span></span>
+        Auto-mark blocked cells
+      </label>
+      <button id="new" class="btn btn-primary" type="button">New puzzle</button>
+    </div>
+  </div>
+
+  <dialog id="help" class="sheet">
+    <h2>How to play</h2>
+    <ul class="rules">
+      <li><span data-piece="boxer"></span> <span>Place <b>one boxer</b> in every <b>row</b>, every <b>column</b> and every <b>colored region</b>.</span></li>
+      <li><span aria-hidden="true">🚫</span> <span>Boxers need their space. They <b>can’t touch</b> each other, not even diagonally.</span></li>
+      <li><span data-piece="mark"></span> <span>Tap a square once to mark it with a paw (no boxer here). Tap again to place a boxer, and a third time to clear it.</span></li>
+      <li><span aria-hidden="true">👆</span> <span>Drag across squares to mark lots of them at once.</span></li>
+    </ul>
+    <p class="muted">Every puzzle has exactly one solution, and you can always solve it with logic. No guessing needed.</p>
+    <button class="btn btn-primary wide" type="button" data-close>Let’s play!</button>
+  </dialog>
+
+  <dialog id="win" class="sheet win">
+    <div id="win-logo" class="win-logo"></div>
+    <h2 id="win-title">Best in show!</h2>
+    <div id="win-stats" class="win-stats"></div>
+    <div class="win-actions">
+      <button id="win-share" class="btn" type="button">Share</button>
+      <button id="win-next" class="btn btn-primary" type="button">Next puzzle</button>
+    </div>
+    <button class="link-btn" type="button" data-close>View board</button>
+  </dialog>
+
+  <div id="confetti" class="confetti-layer" aria-hidden="true"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/theme.js"></script>
+  <script src="js/generator.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
